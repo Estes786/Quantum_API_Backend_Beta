@@ -1,65 +1,70 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <title>Quantum AI Frontend</title>
-    <style>
-      /* Ini hanya untuk membuat tampilannya bagus */
-      body {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        height: 100vh;
-        margin: 0;
-        font-family: sans-serif;
-        background-color: #f0f2f5;
-      }
-      .card {
-        text-align: center;
-        padding: 40px;
-        border-radius: 12px;
-        background-color: white;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      }
-      .message-box {
-        background-color: #f9fafb;
-        padding: 20px;
-        border-radius: 8px;
-        margin-top: 20px;
-        border: 1px solid #e5e7eb;
-        font-family: monospace;
-        font-size: 1.2rem;
-      }
-    </style>
-  </head>
-  <body>
-    <div class="card">
-      <h1>Quantum Flask API</h1>
-      <p>Your Hybrid-Quantum AI Backend is Live</p>
+<head>
+  <title>Kalkulator Kuantum-Hibrida</title>
+  <style>
+    body { display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; font-family: sans-serif; background-color: #f0f2f5; }
+    .card { text-align: center; padding: 40px; border-radius: 12px; background-color: white; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); width: 350px; }
+    input { font-size: 1.2rem; padding: 10px; margin: 5px; width: 80px; text-align: center; border: 1px solid #ccc; border-radius: 8px; }
+    button { font-size: 1.2rem; padding: 10px 20px; margin-top: 15px; border: none; background-color: #007bff; color: white; border-radius: 8px; cursor: pointer; }
+    button:hover { background-color: #0056b3; }
+    .result-box { background-color: #e9ecef; padding: 20px; border-radius: 8px; margin-top: 20px; border: 1px solid #ced4da; font-family: monospace; font-size: 2rem; font-weight: bold; }
+  </style>
+</head>
+<body>
 
-      <!-- Pesan dari server akan muncul di sini -->
-      <div id="backend-message" class="message-box">
-        Menghubungi server kuantum...
-      </div>
+  <div class="card">
+    <h1>Kalkulator Interaktif</h1>
+    <p>Kirim data ke Backend Anda!</p>
+    
+    <div>
+      <input type="number" id="angka1" placeholder="Angka 1">
+      <span>+</span>
+      <input type="number" id="angka2" placeholder="Angka 2">
     </div>
 
-    <script>
-      // Ini adalah "otak" halaman web kita
-      document.addEventListener("DOMContentLoaded", function () {
-        // GANTI URL DI BAWAH INI DENGAN URL VERCEL ANDA
-        const backendUrl = "https://quantum-api-backend.vercel.app/";
+    <button onclick="kirimKeBackend()">= Hitung</button>
 
-        fetch(backendUrl)
-          .then((response) => response.text())
-          .then((data) => {
-            // Temukan kotak pesan dan ganti isinya dengan data dari server
-            document.getElementById("backend-message").innerText = data;
-          })
-          .catch((error) => {
-            console.error("Error fetching data:", error);
-            document.getElementById("backend-message").innerText =
-              "Gagal terhubung ke backend.";
-          });
-      });
-    </script>
-  </body>
-</html> 
+    <div id="hasil-perhitungan" class="result-box">
+      Hasil akan muncul di sini
+    </div>
+  </div>
+
+  <script>
+    // Ini adalah "otak" baru halaman web kita
+    async function kirimKeBackend() {
+      const hasilBox = document.getElementById('hasil-perhitungan');
+      hasilBox.innerText = 'Menghitung...';
+
+      try {
+        const angka1 = document.getElementById('angka1').value;
+        const angka2 = document.getElementById('angka2').value;
+
+        // Alamat backend kita, sekarang menunjuk ke rute '/hitung'
+        const backendUrl = 'https://quantum-api-backend.vercel.app/hitung';
+
+        const response = await fetch(backendUrl, {
+          method: 'POST', // Kita menggunakan metode POST untuk mengirim data
+          headers: {
+            'Content-Type': 'application/json', // Beritahu server kita mengirim JSON
+          },
+          body: JSON.stringify({ a: angka1, b: angka2 }), // Ubah data kita menjadi teks JSON
+        });
+
+        const data = await response.json(); // Ambil respons sebagai JSON
+
+        if (data.error) {
+          hasilBox.innerText = data.error;
+        } else {
+          hasilBox.innerText = data.hasil;
+        }
+
+      } catch (error) {
+        console.error('Error:', error);
+        hasilBox.innerText = 'Koneksi Gagal';
+      }
+    }
+  </script>
+
+</body>
+</html>
